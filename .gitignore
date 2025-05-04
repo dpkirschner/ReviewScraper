@@ -1,35 +1,92 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+      
+# Node.js dependencies
+# --------------------
+# Usually gitignore the node_modules directory
+node_modules/
 
-# C extensions
-*.so
-
-# Distribution / packaging
+# Build artifacts and output
+# ---------------------------
+# Compiled files (TypeScript, etc.) or bundled output
 dist/
 build/
-*.egg-info/
+out/
+public/ # Depending on project structure, sometimes build output goes here
+.next/ # Next.js build output
+.nuxt/ # Nuxt.js build output
+*.tsbuildinfo # TypeScript incremental build info
 
-# Virtual environments
-venv/
-env/
-ENV/
+# Log files
+# ---------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json # npm crash reports
+
+# Environment variables
+# ----------------------
+# Never commit sensitive environment variables!
 .env
+.env.*
+!.env.example
+!.env.template
 
-# IDE files
-.idea/
+# Operating System files
+# ----------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# Linux
+*~
+
+# IDE / Editor configuration files
+# --------------------------------
+# VS Code
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+# JetBrains (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# Atom
+.atom/
+# Vim
 *.swp
 *.swo
 
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
+# Testing artifacts
+# -----------------
+coverage/
+lcov-report/
+.nyc_output/
+*.lcov
 
-# Logs
-*.log
+# Dependency directories (Yarn PnP)
+# ---------------------------------
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 
-# Local configuration
-.env
+# Other temporary or local files
+# ------------------------------
+# For example, database dumps, local config overrides, etc.
+# *.local
