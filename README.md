@@ -1,6 +1,3 @@
-Okay, here is a consolidated `README.md` file describing the complete project (scraping + analysis) as a functional Node.js application.
-
-```markdown
 # App Store Review Scraper & LLM Analyzer
 
 ## 🚀 Overview
@@ -162,6 +159,3 @@ node analyze-reviews.js \
     OPENAI_API_KEY=sk-YourSecretKeyHere
     ```
 5.  **Taxonomy:** Create your `taxonomy.json` file (e.g., in a `config` directory).
-
-You are now ready to run the scraping and analysis scripts as described in the Usage section.
-```
