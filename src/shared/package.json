@@ -1,13 +1,19 @@
 {
-  "name": "@review-scraper/scraper",
+  "name": "@review-scraper/shared",
   "version": "1.0.0",
-  "description": "Review scraping service for extracting app reviews from various stores",
+  "description": "Shared utilities, types, and configurations for review scraper services",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types/index.js",
+    "./utils": "./dist/utils/index.js",
+    "./config": "./dist/config/index.js"
+  },
   "scripts": {
     "build": "tsc --build",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
+    "dev": "tsc --build --watch",
     "clean": "rm -rf dist",
     "test": "vitest",
     "test:watch": "vitest --watch",
@@ -16,18 +22,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "app-store-scraper": "^0.26.0",
-    "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
-    "tsx": "^4.19.1",
     "typescript": "^5.6.3",
     "vitest": "^2.1.2"
   },
-  "keywords": ["reviews", "scraping", "app-store", "data-extraction"],
+  "keywords": ["shared", "types", "utilities", "configuration"],
   "author": "Review Scraper Team",
   "license": "MIT"
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@review-scraper/scraper",
+  "name": "@review-scraper/api",
   "version": "1.0.0",
-  "description": "Review scraping service for extracting app reviews from various stores",
+  "description": "REST API service for review scraper platform",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -16,8 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "app-store-scraper": "^0.26.0",
-    "csv-writer": "^1.6.0",
+    "fastify": "^4.28.1",
     "dotenv": "^16.4.5",
     "zod": "^3.23.8"
   },
@@ -27,7 +26,7 @@
     "typescript": "^5.6.3",
     "vitest": "^2.1.2"
   },
-  "keywords": ["reviews", "scraping", "app-store", "data-extraction"],
+  "keywords": ["api", "rest", "fastify", "reviews"],
   "author": "Review Scraper Team",
   "license": "MIT"
 }

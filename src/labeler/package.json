@@ -1,0 +1,19 @@
+{
+  "name": "@review-scraper/labeler",
+  "version": "1.0.0",
+  "description": "Python-based review labeling and sentiment analysis service",
+  "scripts": {
+    "dev": "python -m src.main",
+    "start": "python -m src.main",
+    "test": "pytest",
+    "test:watch": "pytest-watch",
+    "lint": "ruff check src/",
+    "lint:fix": "ruff check src/ --fix",
+    "format": "black src/",
+    "format:check": "black src/ --check",
+    "typecheck": "mypy src/"
+  },
+  "keywords": ["labeling", "sentiment-analysis", "ml", "nlp"],
+  "author": "Review Scraper Team",
+  "license": "MIT"
+}

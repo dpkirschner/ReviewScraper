@@ -1,21 +1,67 @@
 {
-  "name": "reviewscraper",
+  "name": "review-scraper",
   "version": "1.0.0",
-  "description": "Node.js web scraper for scraping reviews from the Apple App Store.",
-  "main": "index.js",
+  "description": "A comprehensive review scraping and analysis platform with TypeScript services",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.12.1",
+  "workspaces": [
+    "src/scraper",
+    "src/labeler", 
+    "src/shared",
+    "src/api"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm -r build",
+    "dev": "concurrently \"pnpm:dev:*\"",
+    "dev:scraper": "pnpm --filter scraper dev",
+    "dev:labeler": "pnpm --filter labeler dev", 
+    "dev:api": "pnpm --filter api dev",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm -r test:watch",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "format": "prettier --write \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "start": "concurrently \"pnpm:start:*\"",
+    "start:scraper": "pnpm --filter scraper start",
+    "start:api": "pnpm --filter api start",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dpkirschner/ReviewScraper.git"
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "@typescript-eslint/eslint-plugin": "^8.8.1", 
+    "@typescript-eslint/parser": "^8.8.1",
+    "@vitest/ui": "^2.1.2",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.12.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.2"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/dpkirschner/ReviewScraper/issues"
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
   },
-  "homepage": "https://github.com/dpkirschner/ReviewScraper#readme"
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "author": "Review Scraper Team",
+  "license": "MIT",
+  "keywords": [
+    "review-scraping",
+    "sentiment-analysis", 
+    "typescript",
+    "microservices",
+    "data-processing"
+  ]
 }
+>>>>>>> 98bd166 (migrate to typescript)
