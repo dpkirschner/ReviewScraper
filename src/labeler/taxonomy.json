@@ -1,0 +1,109 @@
+{
+  "themes": [
+    {
+      "name": "Ease of Use",
+      "sample_quotes": [
+        "Easy to use.",
+        "Easy to use, great interface."
+      ]
+    },
+    {
+      "name": "Bugs / Stability",
+      "sample_quotes": [
+        "I get error 404.",
+        "It used to work perfectly, but after the latest update, I can't use it anymore. It keeps crashing."
+      ]
+    },
+    {
+      "name": "Payment / Settlement",
+      "sample_quotes": [
+        "Venmo integration would be nice.",
+        "Love the Venmo integration to settle up."
+      ]
+    },
+    {
+      "name": "Feature Request",
+      "sample_quotes": [
+        "Would be nice to have categories.",
+        "Wish it had options for splitting costs unevenly for certain items within an expense."
+      ]
+    },
+    {
+      "name": "Cost / Subscription",
+      "sample_quotes": [
+        "Happy to pay for the Pro version.",
+        "It's free and does everything I need!"
+      ]
+    },
+    {
+      "name": "Group Management",
+      "sample_quotes": [
+        "Easy to add members to groups.",
+        "Can't remove members from a group once added."
+      ]
+    },
+    {
+      "name": "Multi-Currency",
+      "sample_quotes": [
+        "Perfect for international trips with friends!",
+        "Great multi-currency support, essential for travel."
+      ]
+    },
+    {
+      "name": "Ads / Intrusiveness",
+      "sample_quotes": [
+        "Too many ads, very intrusive.",
+        "The ads are unbearable, uninstalling."
+      ]
+    },
+    {
+      "name": "Itemization",
+      "sample_quotes": [
+        "Wish I could itemize expenses more easily.",
+        "Love the ability to itemize expenses within a bill."
+      ]
+    },
+    {
+      "name": "Performance / Speed",
+      "sample_quotes": [
+        "Very fast and responsive.",
+        "A bit slow sometimes, especially when syncing."
+      ]
+    },
+    {
+      "name": "Sync / Offline Use",
+      "sample_quotes": [
+        "Syncing between devices is seamless.",
+        "Syncing sometimes fails, leading to discrepancies."
+      ]
+    },
+    {
+      "name": "Notifications / Reminders",
+      "sample_quotes": [
+        "The settlement reminders are very helpful.",
+        "Wish it had reminders for when people owe you money."
+      ]
+    },
+    {
+      "name": "Data Export / Backup",
+      "sample_quotes": [
+        "Easy to export data to CSV for records.",
+        "Need better reporting and export options."
+      ]
+    },
+    {
+      "name": "Customer Support",
+      "sample_quotes": [
+        "Developer is responsive to feedback.",
+        "No response from customer support about my issue."
+      ]
+    },
+    {
+      "name": "Recurring Bills",
+      "sample_quotes": [
+        "Handles recurring bills like rent perfectly.",
+        "Needs improvement for handling recurring expenses."
+      ]
+    }
+  ]
+}

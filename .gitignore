@@ -1,8 +1,22 @@
+<<<<<<< HEAD
       
 # Node.js dependencies
 # --------------------
 # Usually gitignore the node_modules directory
 node_modules/
+=======
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+>>>>>>> 2f465dd (init commit)
 
 # Build artifacts and output
 # ---------------------------
@@ -28,11 +42,17 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json # npm crash reports
 
 # Environment variables
 # ----------------------
-# Never commit sensitive environment variables!
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.*
 !.env.example
 !.env.template
+=======
+.venv/
+
 
 # Operating System files
 # ----------------------
@@ -78,6 +98,7 @@ lcov-report/
 .nyc_output/
 *.lcov
 
+<<<<<<< HEAD
 # Dependency directories (Yarn PnP)
 # ---------------------------------
 .yarn/cache
@@ -90,3 +111,20 @@ lcov-report/
 # ------------------------------
 # For example, database dumps, local config overrides, etc.
 # *.local
+=======
+# Logs
+*.log
+logs/
+
+# Data files (scraping outputs)
+data/raw/*.csv
+data/processed/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+>>>>>>> 2f465dd (init commit)
