@@ -1,21 +1,52 @@
+import { StructuredLogger, createLogger } from '../logging/logger.js';
+
+/**
+ * @deprecated Use StructuredLogger from '../logging/logger.js' for new code
+ * This class is maintained for backward compatibility
+ */
 export class Logger {
-  constructor(private context: string = 'App') {}
+  private structuredLogger: StructuredLogger;
+
+  constructor(private context: string = 'App') {
+    this.structuredLogger = createLogger(context);
+  }
 
   info(message: string, ...args: unknown[]): void {
-    console.log(`[${new Date().toISOString()}] [${this.context}] INFO: ${message}`, ...args);
+    if (args.length > 0) {
+      this.structuredLogger.info(message, { args });
+    } else {
+      this.structuredLogger.info(message);
+    }
   }
 
   warn(message: string, ...args: unknown[]): void {
-    console.warn(`[${new Date().toISOString()}] [${this.context}] WARN: ${message}`, ...args);
+    if (args.length > 0) {
+      this.structuredLogger.warn(message, { args });
+    } else {
+      this.structuredLogger.warn(message);
+    }
   }
 
   error(message: string, ...args: unknown[]): void {
-    console.error(`[${new Date().toISOString()}] [${this.context}] ERROR: ${message}`, ...args);
+    if (args.length > 0) {
+      this.structuredLogger.error(message, undefined, { args });
+    } else {
+      this.structuredLogger.error(message);
+    }
   }
 
   debug(message: string, ...args: unknown[]): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[${new Date().toISOString()}] [${this.context}] DEBUG: ${message}`, ...args);
+    if (args.length > 0) {
+      this.structuredLogger.debug(message, { args });
+    } else {
+      this.structuredLogger.debug(message);
     }
+  }
+
+  /**
+   * Get the underlying structured logger for advanced usage
+   */
+  getStructuredLogger(): StructuredLogger {
+    return this.structuredLogger;
   }
 }

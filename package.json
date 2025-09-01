@@ -31,7 +31,11 @@
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "tsx src/shared/src/database/cli.ts migrate",
+    "db:rollback": "tsx src/shared/src/database/cli.ts rollback",
+    "db:status": "tsx src/shared/src/database/cli.ts status",
+    "db:create-migration": "tsx src/shared/src/database/cli.ts create"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
