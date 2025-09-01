@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ReviewScraper } from './scraper.js';
 
 // Mock the app-store-scraper module
 vi.mock('app-store-scraper', () => ({
@@ -13,6 +12,19 @@ vi.mock('app-store-scraper', () => ({
   },
 }));
 
+// Mock the shared module imports
+vi.mock('@review-scraper/shared', () => ({
+  Logger: class MockLogger {
+    info = vi.fn();
+    warn = vi.fn();
+    error = vi.fn();
+  },
+  sanitizeFilename: vi.fn((name: string) => name.replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '_') || 'app'),
+}));
+
+// Import after mocking
+import { ReviewScraper } from './scraper.js';
+
 describe('ReviewScraper', () => {
   let scraper: ReviewScraper;
 
@@ -21,24 +33,27 @@ describe('ReviewScraper', () => {
     vi.clearAllMocks();
   });
 
-  describe('scrapeReviews', () => {
-    it('should handle app ID correctly', async () => {
-      const appId = '123456789';
-      
-      // We'll need to mock the store methods properly
-      // This is a basic structure for now
-      expect(() => scraper).not.toThrow();
+  describe('constructor', () => {
+    it('should create an instance without throwing', () => {
+      expect(() => new ReviewScraper()).not.toThrow();
     });
 
-    it('should validate app ID format', () => {
-      expect(typeof '123456789').toBe('string');
-      expect('123456789'.length).toBeGreaterThan(0);
+    it('should create instance of ReviewScraper', () => {
+      expect(scraper).toBeInstanceOf(ReviewScraper);
     });
   });
 
-  describe('configuration', () => {
-    it('should have default configuration values', () => {
-      expect(scraper).toBeInstanceOf(ReviewScraper);
+  describe('basic validation', () => {
+    it('should validate app ID format', () => {
+      const appId = '123456789';
+      expect(typeof appId).toBe('string');
+      expect(appId.length).toBeGreaterThan(0);
+    });
+
+    it('should handle empty app ID', () => {
+      const appId = '';
+      expect(typeof appId).toBe('string');
+      expect(appId.length).toBe(0);
     });
   });
 });

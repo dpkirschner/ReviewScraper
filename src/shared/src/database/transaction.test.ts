@@ -20,9 +20,8 @@ const mockPool = {
 };
 
 describe('Transaction', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    // @ts-ignore
     const { getDatabasePool } = await import('./pool.js');
     vi.mocked(getDatabasePool).mockReturnValue(mockPool as any);
   });

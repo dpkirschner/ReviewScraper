@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "app-store-scraper": "^0.26.0",
+    "app-store-scraper": "^0.18.0",
     "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
     "zod": "^3.23.8"

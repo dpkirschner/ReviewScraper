@@ -11,16 +11,16 @@ export class DatabasePool {
 
   constructor(config: Partial<DatabaseConfig> = {}) {
     // Parse DATABASE_URL if provided, otherwise use individual config
-    const databaseUrl = process.env.DATABASE_URL;
+    const databaseUrl = process.env['DATABASE_URL'];
     if (databaseUrl) {
       this.config = this.parseDatabaseUrl(databaseUrl, config);
     } else {
       this.config = DatabaseConfigSchema.parse({
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
+        host: process.env['DB_HOST'],
+        port: process.env['DB_PORT'] ? parseInt(process.env['DB_PORT']) : undefined,
+        database: process.env['DB_NAME'],
+        user: process.env['DB_USER'],
+        password: process.env['DB_PASSWORD'],
         ...config,
       });
     }
@@ -170,7 +170,7 @@ export class DatabasePool {
         idleConnectionCount: this.pool.idleCount,
         waitingCount: this.pool.waitingCount,
         responseTime,
-        lastError,
+        ...(lastError !== undefined && { lastError }),
       };
 
       // Cache the health result

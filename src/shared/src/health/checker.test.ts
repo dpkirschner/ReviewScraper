@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { HealthMonitor, createHealthMonitor, getHealthMonitor } from './checker.js';
+import { HealthMonitor, createHealthMonitor, getHealthMonitor, closeHealthMonitor } from './checker.js';
 import { HealthChecker, DependencyHealth, ReadinessCheck, LivenessCheck } from './types.js';
 
 // Mock the database health checker
@@ -179,13 +179,17 @@ describe('HealthMonitor', () => {
 
   describe('liveness checks', () => {
     it('should check liveness with default uptime check', async () => {
-      // Wait a moment to ensure uptime > 0
-      await new Promise(resolve => setTimeout(resolve, 10));
+      // Create a monitor that's been running longer than 5 seconds
+      const oldMonitor = new HealthMonitor('old-service', '1.0.0');
+      // Mock the start time to be 6 seconds ago
+      (oldMonitor as any).startTime = new Date(Date.now() - 6000);
       
-      const result = await healthMonitor.checkLiveness();
+      const result = await oldMonitor.checkLiveness();
       
       expect(result.alive).toBe(true);
       expect(result.checks.uptime).toBe(true);
+      
+      oldMonitor.stopPeriodicChecking();
     });
 
     it('should check liveness with custom checks', async () => {
@@ -256,12 +260,7 @@ describe('HealthMonitor', () => {
 describe('Health monitor factory functions', () => {
   afterEach(() => {
     // Clean up global instance
-    try {
-      const monitor = getHealthMonitor();
-      monitor.stopPeriodicChecking();
-    } catch {
-      // Ignore if not initialized
-    }
+    closeHealthMonitor();
   });
 
   describe('createHealthMonitor', () => {

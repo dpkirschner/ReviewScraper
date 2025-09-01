@@ -2,8 +2,10 @@
  * Sanitizes a string for use in filename by removing invalid characters
  */
 export function sanitizeFilename(name: string): string {
-  return name
+  const sanitized = name
+    .trim()
     .replace(/[\\/:*?"<>|]/g, '')
-    .replace(/\s+/g, '_')
-    .trim() || 'app';
+    .replace(/\s+/g, '_');
+  
+  return sanitized || 'app';
 }

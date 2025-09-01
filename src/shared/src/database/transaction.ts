@@ -14,7 +14,7 @@ export class Transaction {
     this.context = {
       id: randomUUID(),
       startTime: new Date(),
-      isolationLevel,
+      ...(isolationLevel !== undefined && { isolationLevel }),
     };
     this.logger = new Logger('Transaction');
   }

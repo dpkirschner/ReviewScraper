@@ -60,13 +60,13 @@ describe('StructuredLogger', () => {
     });
 
     it('should log warnings', () => {
-      logger.warn('Test warning', { context: 'test' });
+      logger.warn('Test warning', { someField: 'test' });
       
       expect(mockPino.warn).toHaveBeenCalledWith(
         expect.objectContaining({
           level: 'warn',
           msg: 'Test warning',
-          metadata: { context: 'test' },
+          metadata: { someField: 'test' },
         })
       );
     });

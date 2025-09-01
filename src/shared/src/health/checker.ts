@@ -387,3 +387,10 @@ export function getHealthMonitor(): HealthMonitor {
   
   return globalHealthMonitor;
 }
+
+export function closeHealthMonitor(): void {
+  if (globalHealthMonitor) {
+    globalHealthMonitor.stopPeriodicChecking();
+    globalHealthMonitor = null;
+  }
+}
