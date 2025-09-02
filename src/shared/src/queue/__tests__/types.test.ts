@@ -11,7 +11,7 @@ import {
   QueueConfigSchema,
   getJobSchema,
   validateJobPayload,
-} from './types.js';
+} from '../types.js';
 
 describe('Job Types', () => {
   describe('JobTypes constant', () => {

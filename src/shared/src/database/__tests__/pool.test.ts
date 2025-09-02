@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Mock all external dependencies
-vi.mock('../utils/logger.js', () => ({
+vi.mock('../../utils/logger.js', () => ({
   Logger: class MockLogger {
     info = vi.fn();
     warn = vi.fn();
@@ -10,7 +10,7 @@ vi.mock('../utils/logger.js', () => ({
   }
 }));
 
-vi.mock('./types.js', () => ({
+vi.mock('../types.js', () => ({
   DatabaseConfigSchema: {
     parse: vi.fn().mockImplementation((config) => ({
       host: 'localhost',
@@ -31,8 +31,6 @@ vi.mock('./types.js', () => ({
   }
 }));
 
-import { DatabasePool, createDatabasePool, getDatabasePool, closeDatabasePool } from './pool.js';
-
 // Mock pg module
 vi.mock('pg', () => ({
   Pool: vi.fn().mockImplementation(() => ({
@@ -49,17 +47,46 @@ vi.mock('pg', () => ({
   })),
 }));
 
+import { DatabasePool, createDatabasePool, getDatabasePool, closeDatabasePool } from '../pool.js';
+
 describe('DatabasePool', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  afterEach(async () => {
+    await DatabasePool.closeInstance();
   });
 
-  afterEach(async () => {
-    try {
-      await closeDatabasePool();
-    } catch {
-      // Ignore errors during cleanup
-    }
+  describe('getInstance', () => {
+    it('should create and return a singleton instance', async () => {
+      const pool1 = await DatabasePool.getInstance();
+      const pool2 = await DatabasePool.getInstance();
+
+      expect(pool1).toBeInstanceOf(DatabasePool);
+      expect(pool1).toBe(pool2);
+    });
+
+    it('should initialize the pool on first call', async () => {
+      const pool = await DatabasePool.getInstance();
+      expect(pool.isInitialized).toBe(true);
+    });
+  });
+
+  describe('closeInstance', () => {
+    it('should close the pool and reset the instance', async () => {
+      const pool1 = await DatabasePool.getInstance();
+      await DatabasePool.closeInstance();
+      const pool2 = await DatabasePool.getInstance();
+
+      expect(pool1).not.toBe(pool2);
+    });
+  });
+
+  describe('query', () => {
+    it('should execute a query on the initialized pool', async () => {
+      const pool = await DatabasePool.getInstance();
+      const result = await pool.query('SELECT * FROM test');
+
+      expect(result.rowCount).toBe(1);
+      expect(result.rows).toEqual([{ test: 1 }]);
+    });
   });
 
   describe('constructor', () => {
@@ -78,6 +105,18 @@ describe('DatabasePool', () => {
   });
 
   describe('singleton functions', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    afterEach(async () => {
+      try {
+        await closeDatabasePool();
+      } catch {
+        // Ignore errors during cleanup
+      }
+    });
+
     it('should create global pool instance', () => {
       const pool = createDatabasePool({
         host: 'localhost',

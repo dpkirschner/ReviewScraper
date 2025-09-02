@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { createDatabasePool, runMigrations, rollbackMigrations, getMigrationStatus, createMigration } from './migrate.js';
+import { runMigrations, rollbackMigrations, getMigrationStatus, createMigration } from './migrate.js';
+import { getDatabasePool, closeDatabasePool } from './pool.js';
 import { Logger } from '../utils/logger.js';
 
 const logger = new Logger('DB-CLI');
@@ -10,8 +11,7 @@ async function main() {
   const args = process.argv.slice(3);
 
   // Initialize database pool
-  const pool = createDatabasePool();
-  await pool.initialize();
+  await getDatabasePool();
 
   try {
     switch (command) {
@@ -65,7 +65,7 @@ async function main() {
     logger.error('Command failed:', error);
     process.exit(1);
   } finally {
-    await pool.close();
+    await closeDatabasePool();
   }
 }
 

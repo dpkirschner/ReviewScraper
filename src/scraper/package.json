@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@review-scraper/shared": "workspace:*",
     "app-store-scraper": "^0.18.0",
     "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",

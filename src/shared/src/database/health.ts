@@ -3,10 +3,18 @@ import { DatabaseHealth } from './types.js';
 import { Logger } from '../utils/logger.js';
 
 export class DatabaseHealthChecker {
+  private static instance: DatabaseHealthChecker | null = null;
   private logger: Logger;
 
-  constructor() {
+  private constructor() {
     this.logger = new Logger('DatabaseHealthChecker');
+  }
+
+  public static getInstance(): DatabaseHealthChecker {
+    if (!DatabaseHealthChecker.instance) {
+      DatabaseHealthChecker.instance = new DatabaseHealthChecker();
+    }
+    return DatabaseHealthChecker.instance;
   }
 
   /**
@@ -14,7 +22,7 @@ export class DatabaseHealthChecker {
    */
   async check(): Promise<DatabaseHealth> {
     try {
-      const pool = getDatabasePool();
+      const pool = await getDatabasePool();
       return await pool.health();
     } catch (error) {
       this.logger.error('Database health check failed:', error);
@@ -59,7 +67,7 @@ export class DatabaseHealthChecker {
    */
   async getPoolMetrics() {
     try {
-      const pool = getDatabasePool();
+      const pool = await getDatabasePool();
       const health = await pool.health();
       const stats = pool.stats;
 
@@ -80,7 +88,7 @@ export class DatabaseHealthChecker {
    */
   async runMaintenance(): Promise<void> {
     try {
-      const pool = getDatabasePool();
+      const pool = await getDatabasePool();
       
       // Update table statistics
       await pool.query('ANALYZE');
@@ -94,11 +102,4 @@ export class DatabaseHealthChecker {
 }
 
 // Singleton instance
-let healthChecker: DatabaseHealthChecker | null = null;
-
-export function getDatabaseHealthChecker(): DatabaseHealthChecker {
-  if (!healthChecker) {
-    healthChecker = new DatabaseHealthChecker();
-  }
-  return healthChecker;
-}
+export const getDatabaseHealthChecker = DatabaseHealthChecker.getInstance;

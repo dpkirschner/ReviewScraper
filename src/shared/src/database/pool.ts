@@ -3,6 +3,7 @@ import { DatabaseConfig, DatabaseConfigSchema, DatabaseHealth } from './types.js
 import { Logger } from '../utils/logger.js';
 
 export class DatabasePool {
+  private static instance: DatabasePool | null = null;
   private pool: Pool | null = null;
   private config: DatabaseConfig;
   private logger: Logger;
@@ -10,7 +11,6 @@ export class DatabasePool {
   private readonly HEALTH_CACHE_TTL = 5000; // 5 seconds
 
   constructor(config: Partial<DatabaseConfig> = {}) {
-    // Parse DATABASE_URL if provided, otherwise use individual config
     const databaseUrl = process.env['DATABASE_URL'];
     if (databaseUrl) {
       this.config = this.parseDatabaseUrl(databaseUrl, config);
@@ -28,13 +28,28 @@ export class DatabasePool {
     this.logger = new Logger('DatabasePool');
   }
 
+  public static async getInstance(config?: Partial<DatabaseConfig>): Promise<DatabasePool> {
+    if (!DatabasePool.instance) {
+      DatabasePool.instance = new DatabasePool(config);
+      await DatabasePool.instance.initialize();
+    }
+    return DatabasePool.instance;
+  }
+
+  public static async closeInstance(): Promise<void> {
+    if (DatabasePool.instance) {
+      await DatabasePool.instance.close();
+      DatabasePool.instance = null;
+    }
+  }
+
   private parseDatabaseUrl(url: string, overrides: Partial<DatabaseConfig>): DatabaseConfig {
     const parsed = new URL(url);
     
     const baseConfig = {
       host: parsed.hostname,
       port: parsed.port ? parseInt(parsed.port) : 5432,
-      database: parsed.pathname.slice(1), // Remove leading '/'
+      database: parsed.pathname.slice(1),
       user: parsed.username,
       password: parsed.password,
       ssl: parsed.searchParams.get('ssl') === 'true' || parsed.searchParams.get('sslmode') === 'require',
@@ -43,7 +58,7 @@ export class DatabasePool {
     return DatabaseConfigSchema.parse({ ...baseConfig, ...overrides });
   }
 
-  async initialize(): Promise<void> {
+  private async initialize(): Promise<void> {
     if (this.pool) {
       this.logger.warn('Database pool already initialized');
       return;
@@ -67,10 +82,8 @@ export class DatabasePool {
 
     this.pool = new Pool(poolConfig);
 
-    // Set up event handlers
     this.pool.on('connect', (client: PoolClient) => {
       this.logger.debug('New client connected');
-      // Set up client-specific configuration
       client.query('SET timezone TO UTC');
     });
 
@@ -82,7 +95,6 @@ export class DatabasePool {
       this.logger.debug('Client removed from pool');
     });
 
-    // Test connection
     try {
       const client = await this.pool.connect();
       await client.query('SELECT 1 as test');
@@ -140,7 +152,6 @@ export class DatabasePool {
   }
 
   async health(): Promise<DatabaseHealth> {
-    // Return cached health if still valid
     if (this.healthCache && Date.now() - this.healthCache.timestamp < this.HEALTH_CACHE_TTL) {
       return this.healthCache.data;
     }
@@ -154,12 +165,10 @@ export class DatabasePool {
         throw new Error('Database pool not initialized');
       }
 
-      // Test connection with a simple query
       await this.query('SELECT 1 as health_check');
       
       const responseTime = Date.now() - startTime;
       
-      // Check if response time indicates degraded performance
       if (responseTime > 1000) {
         status = 'degraded';
       }
@@ -173,7 +182,6 @@ export class DatabasePool {
         ...(lastError !== undefined && { lastError }),
       };
 
-      // Cache the health result
       this.healthCache = {
         data: health,
         timestamp: Date.now(),
@@ -192,7 +200,6 @@ export class DatabasePool {
         lastError,
       };
 
-      // Cache the unhealthy result for a shorter time
       this.healthCache = {
         data: health,
         timestamp: Date.now(),
@@ -202,7 +209,7 @@ export class DatabasePool {
     }
   }
 
-  async close(): Promise<void> {
+  private async close(): Promise<void> {
     if (!this.pool) {
       return;
     }
@@ -235,29 +242,26 @@ export class DatabasePool {
   }
 }
 
-// Singleton instance
-let globalPool: DatabasePool | null = null;
-
+// Convenience functions for easier migration
 export function createDatabasePool(config?: Partial<DatabaseConfig>): DatabasePool {
-  if (globalPool) {
+  // In singleton pattern, we can't directly return a new instance
+  // Instead, we set the instance if it doesn't exist yet
+  if (DatabasePool.instance) {
     throw new Error('Database pool already exists. Use getDatabasePool() to get the existing instance.');
   }
   
-  globalPool = new DatabasePool(config);
-  return globalPool;
+  // Return a promise-like object that the caller can await if needed
+  const instance = new DatabasePool(config);
+  DatabasePool.instance = instance;
+  return instance;
 }
 
 export function getDatabasePool(): DatabasePool {
-  if (!globalPool) {
+  if (!DatabasePool.instance) {
     throw new Error('Database pool not initialized. Call createDatabasePool() first.');
   }
   
-  return globalPool;
+  return DatabasePool.instance;
 }
 
-export async function closeDatabasePool(): Promise<void> {
-  if (globalPool) {
-    await globalPool.close();
-    globalPool = null;
-  }
-}
+export const closeDatabasePool = DatabasePool.closeInstance;

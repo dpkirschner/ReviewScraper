@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { QueueConnection, createQueueConnection, getQueueConnection, closeQueueConnection } from './connection.js';
+import { QueueConnection, createQueueConnection, getQueueConnection, closeQueueConnection } from '../connection.js';
 
 // Mock IORedis
 vi.mock('ioredis', () => {

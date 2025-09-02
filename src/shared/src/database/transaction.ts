@@ -24,7 +24,7 @@ export class Transaction {
       throw new Error('Transaction already active');
     }
 
-    const pool = getDatabasePool();
+    const pool = await getDatabasePool();
     this.client = await pool.getClient();
 
     try {
@@ -179,7 +179,7 @@ export abstract class Repository {
     if (transaction) {
       return transaction.query<T>(text, params);
     } else {
-      const pool = getDatabasePool();
+      const pool = await getDatabasePool();
       return pool.query<T>(text, params);
     }
   }
@@ -213,5 +213,18 @@ export abstract class Repository {
       transaction
     );
     return result.rows[0]?.exists || false;
+  }
+
+  protected async count(
+    text: string,
+    params?: any[],
+    transaction?: Transaction
+  ): Promise<number> {
+    const result = await this.query<{ count: string }>(
+      `SELECT COUNT(*) as count FROM (${text}) as subquery`,
+      params,
+      transaction
+    );
+    return parseInt(result.rows[0]?.count || '0', 10);
   }
 }

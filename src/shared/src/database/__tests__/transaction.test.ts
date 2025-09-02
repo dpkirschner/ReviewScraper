@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Transaction, withTransaction, Repository } from './transaction.js';
-import { createDatabasePool, closeDatabasePool } from './pool.js';
+import { Transaction, withTransaction, Repository } from '../transaction.js';
+import { getDatabasePool, closeDatabasePool } from '../pool.js';
 
 // Mock the pool module
-vi.mock('./pool.js', () => ({
+vi.mock('../pool.js', () => ({
   getDatabasePool: vi.fn(),
-  createDatabasePool: vi.fn(),
   closeDatabasePool: vi.fn(),
 }));
 
@@ -16,14 +15,14 @@ const mockClient = {
 
 const mockPool = {
   getClient: vi.fn().mockResolvedValue(mockClient),
+  query: vi.fn(),
   close: vi.fn(),
 };
 
 describe('Transaction', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { getDatabasePool } = await import('./pool.js');
-    vi.mocked(getDatabasePool).mockReturnValue(mockPool as any);
+    vi.mocked(getDatabasePool).mockResolvedValue(mockPool as any);
   });
 
   afterEach(async () => {
@@ -144,11 +143,14 @@ describe('Transaction', () => {
       async exists(id: number, transaction?: Transaction) {
         return super.exists('SELECT 1 FROM test WHERE id = $1', [id], transaction);
       }
+
+      async countAll(transaction?: Transaction) {
+        return this.count('SELECT * FROM test', [], transaction);
+      }
     }
 
     it('should execute queries through repository', async () => {
-      mockClient.query.mockResolvedValue({ rows: [{ id: 1, name: 'test' }], rowCount: 1 });
-      mockPool.query = vi.fn().mockResolvedValue({ rows: [{ id: 1, name: 'test' }], rowCount: 1 });
+      mockPool.query.mockResolvedValue({ rows: [{ id: 1, name: 'test' }], rowCount: 1 });
 
       const repo = new TestRepository();
       const result = await repo.findById(1);
@@ -171,13 +173,23 @@ describe('Transaction', () => {
     });
 
     it('should handle exists queries', async () => {
-      mockPool.query = vi.fn().mockResolvedValue({ rows: [{ exists: true }], rowCount: 1 });
+      mockPool.query.mockResolvedValue({ rows: [{ exists: true }], rowCount: 1 });
 
       const repo = new TestRepository();
       const exists = await repo.exists(1);
 
       expect(exists).toBe(true);
       expect(mockPool.query).toHaveBeenCalledWith('SELECT EXISTS(SELECT 1 FROM test WHERE id = $1) as exists', [1]);
+    });
+
+    it('should handle count queries', async () => {
+      mockPool.query.mockResolvedValue({ rows: [{ count: '123' }], rowCount: 1 });
+
+      const repo = new TestRepository();
+      const count = await repo.countAll();
+
+      expect(count).toBe(123);
+      expect(mockPool.query).toHaveBeenCalledWith('SELECT COUNT(*) as count FROM (SELECT * FROM test) as subquery', []);
     });
   });
 });

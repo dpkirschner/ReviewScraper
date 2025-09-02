@@ -82,6 +82,9 @@ importers:
 
   src/scraper:
     dependencies:
+      '@review-scraper/shared':
+        specifier: workspace:*
+        version: link:../shared
       app-store-scraper:
         specifier: ^0.18.0
         version: 0.18.0

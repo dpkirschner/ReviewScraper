@@ -1,16 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { HealthMonitor, createHealthMonitor, getHealthMonitor, closeHealthMonitor } from './checker.js';
-import { HealthChecker, DependencyHealth, ReadinessCheck, LivenessCheck } from './types.js';
+import { HealthMonitor, createHealthMonitor, getHealthMonitor, closeHealthMonitor } from '../checker.js';
+import { HealthChecker, DependencyHealth, ReadinessCheck, LivenessCheck } from '../types.js';
 
 // Mock the database health checker
-vi.mock('../database/health.js', () => ({
+vi.mock('../../database/health.js', () => ({
   getDatabaseHealthChecker: vi.fn(() => ({
     check: vi.fn().mockResolvedValue({
+      name: 'database',
       status: 'healthy',
       connectionCount: 5,
       idleConnectionCount: 3,
       waitingCount: 0,
       responseTime: 10,
+      lastChecked: new Date(),
     }),
   })),
 }));

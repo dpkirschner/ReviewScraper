@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { QueueConnection, QueueFactory, QueueMonitor, JobTypes } from './index.js';
+import { QueueConnection, QueueFactory, QueueMonitor, JobTypes } from '../index.js';
 
 // Mock BullMQ for integration testing
 vi.mock('bullmq', () => {

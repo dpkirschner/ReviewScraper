@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { StructuredLogger, createLogger, getLogger } from './logger.js';
-import { CorrelationManager } from './correlation.js';
+import { StructuredLogger, createLogger, getLogger } from '../logger.js';
+import { CorrelationManager } from '../correlation.js';
 
 // Mock pino
 vi.mock('pino', () => ({

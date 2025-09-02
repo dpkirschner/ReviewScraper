@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeFilename } from './file-utils.js';
+import { sanitizeFilename } from '../file-utils.js';
 
 describe('sanitizeFilename', () => {
   it('should remove invalid filename characters', () => {
