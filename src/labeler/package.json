@@ -1,19 +1,38 @@
 {
   "name": "@review-scraper/labeler",
   "version": "1.0.0",
-  "description": "Python-based review labeling and sentiment analysis service",
+  "description": "Node.js-based review labeling and sentiment analysis service",
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "python -m src.main",
-    "start": "python -m src.main",
-    "test": "pytest",
-    "test:watch": "pytest-watch",
-    "lint": "ruff check src/",
-    "lint:fix": "ruff check src/ --fix",
-    "format": "black src/",
-    "format:check": "black src/ --check",
-    "typecheck": "mypy src/"
+    "build": "tsc --build",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "typecheck": "tsc --noEmit"
   },
-  "keywords": ["labeling", "sentiment-analysis", "ml", "nlp"],
+  "dependencies": {
+    "@review-scraper/shared": "workspace:*",
+    "dotenv": "^16.4.5",
+    "openai": "^4.104.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.2"
+  },
+  "keywords": [
+    "labeling",
+    "sentiment-analysis",
+    "openai",
+    "queue-processing"
+  ],
   "author": "Review Scraper Team",
   "license": "MIT"
 }
