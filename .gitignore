@@ -83,14 +83,16 @@ Desktop.ini
 *.swp
 *.swo
 
-# Testing artifacts
-# -----------------
+# TypeScript build info
+*.tsbuildinfo
+.tsbuildinfo
+
+# Testing
 coverage/
 lcov-report/
 .nyc_output/
 *.lcov
 
-<<<<<<< HEAD
 # Dependency directories (Yarn PnP)
 # ---------------------------------
 .yarn/cache
@@ -101,9 +103,7 @@ lcov-report/
 
 # Other temporary or local files
 # ------------------------------
-# For example, database dumps, local config overrides, etc.
-# *.local
-=======
+
 # Logs
 *.log
 logs/
@@ -119,10 +119,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
-<<<<<<< HEAD
->>>>>>> 2f465dd (init commit)
-=======
 
 # Documentation (generated)
 docs/
->>>>>>> 4183a98 (tech: fixing tests and build issues)

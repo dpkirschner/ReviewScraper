@@ -10,7 +10,7 @@ import {
   Logger,
   Job,
 } from '@review-scraper/shared';
-import { ScraperWorker } from './worker.js';
+import { BullMQScraperWorker } from './queue-worker.js';
 
 /**
  * Scraper service that manages the queue-based scraping system
@@ -20,7 +20,7 @@ export class ScraperService {
   private connection!: QueueConnection;
   private factory!: QueueFactory;
   private monitor!: QueueMonitor;
-  private worker!: ScraperWorker;
+  private queueWorker!: BullMQScraperWorker;
   private logger: Logger;
   private isRunning = false;
 
@@ -47,13 +47,10 @@ export class ScraperService {
       this.factory = createQueueFactory(this.connection);
 
       // Initialize queue monitor
-      this.monitor = new QueueMonitor(this.connection);
+      this.monitor = new QueueMonitor(this.factory, this.connection);
 
-      // Initialize worker
-      this.worker = new ScraperWorker();
-
-      // Create and start the worker
-      await this.startWorker();
+      // Initialize BullMQ worker
+      this.queueWorker = new BullMQScraperWorker();
 
       this.isRunning = true;
       this.logger.info('Scraper service initialized successfully');
@@ -65,23 +62,13 @@ export class ScraperService {
   }
 
   /**
-   * Start the scraper worker to process SCRAPE_REVIEWS jobs
+   * Get the BullMQ worker instance for advanced operations
    */
-  private async startWorker(): Promise<void> {
-    const config = ScraperWorker.getWorkerConfig();
-    
-    await this.factory.createWorker(
-      JobTypes.SCRAPE_REVIEWS,
-      async (job: Job) => {
-        return await this.worker.processScrapingJob(job as Job<ScrapeReviewsJob>);
-      },
-      config
-    );
-
-    this.logger.info('Scraper worker started', {
-      concurrency: config.concurrency,
-      limiter: config.limiter,
-    });
+  getQueueWorker(): BullMQScraperWorker {
+    if (!this.isRunning) {
+      throw new Error('Service not initialized');
+    }
+    return this.queueWorker;
   }
 
   /**
@@ -170,11 +157,9 @@ export class ScraperService {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         service: 'scraper',
-        worker: {
-          running: this.isRunning,
-          config: ScraperWorker.getWorkerConfig(),
-        },
-        connections: await this.connection.getStats(),
+        worker: await this.queueWorker.getStatus(),
+        workerHealth: await this.queueWorker.healthCheck(),
+        connections: this.connection.getStats(),
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -257,6 +242,11 @@ export class ScraperService {
     this.logger.info('Shutting down scraper service...');
 
     try {
+      // Shutdown BullMQ worker first
+      if (this.queueWorker) {
+        await this.queueWorker.shutdown();
+      }
+
       // Close factory (workers and queues)
       if (this.factory) {
         await this.factory.close();
