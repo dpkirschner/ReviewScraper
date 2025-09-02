@@ -1,5 +1,0 @@
-requests
-python-dotenv
-pandas
-app_store_scraper
-openai

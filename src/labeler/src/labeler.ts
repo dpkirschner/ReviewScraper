@@ -1,10 +1,16 @@
 import OpenAI from 'openai';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { 
   Logger, 
   Review, 
   DatabasePool, 
   getDatabasePool 
 } from '@review-scraper/shared';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Sentiment analysis results for a review
@@ -51,8 +57,8 @@ export class ReviewLabeler {
       apiKey: config.apiKey,
     });
 
-    // Load taxonomy (simplified version for now)
-    this.taxonomy = this.getDefaultTaxonomy();
+    // Load taxonomy from file or use default
+    this.taxonomy = this.loadTaxonomy(config.taxonomyPath);
   }
 
   /**
@@ -301,7 +307,29 @@ Return ONLY a JSON array with this exact structure:
   }
 
   /**
-   * Default taxonomy (simplified version)
+   * Load taxonomy from file or return default
+   */
+  private loadTaxonomy(taxonomyPath?: string): any {
+    try {
+      const defaultTaxonomyPath = join(__dirname, '../../config/taxonomy.json');
+      const filePath = taxonomyPath || defaultTaxonomyPath;
+      
+      const taxonomyJson = readFileSync(filePath, 'utf-8');
+      const taxonomy = JSON.parse(taxonomyJson);
+      
+      this.logger.info(`Loaded taxonomy from ${filePath}`, {
+        themeCount: taxonomy.themes?.length || 0
+      });
+      
+      return taxonomy;
+    } catch (error) {
+      this.logger.warn('Failed to load taxonomy file, using default:', error);
+      return this.getDefaultTaxonomy();
+    }
+  }
+
+  /**
+   * Default taxonomy (fallback)
    */
   private getDefaultTaxonomy() {
     return {
