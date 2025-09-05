@@ -8,7 +8,7 @@ export class MetricsCollector {
   private startTime: Date;
   private customMetrics = new Map<string, number>();
   private lastGCStats: any = null;
-  private collectionInterval?: NodeJS.Timeout;
+  private collectionInterval?: NodeJS.Timeout | undefined;
 
   constructor(serviceName: string, version: string = '1.0.0') {
     this.serviceName = serviceName;
@@ -24,7 +24,7 @@ export class MetricsCollector {
     try {
       // This requires running Node.js with --expose-gc flag
       if (global.gc && typeof global.gc === 'function') {
-        const { PerformanceObserver, performance } = require('perf_hooks');
+        const { PerformanceObserver } = require('perf_hooks');
         
         let gcCount = 0;
         let gcDuration = 0;

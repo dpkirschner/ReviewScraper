@@ -4,7 +4,7 @@ import { CorrelationManager } from '../correlation.js';
 
 // Mock pino
 vi.mock('pino', () => ({
-  default: vi.fn(() => ({
+  pino: vi.fn(() => ({
     debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),

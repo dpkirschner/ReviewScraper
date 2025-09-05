@@ -71,8 +71,11 @@ vi.mock('ioredis', () => {
     disconnect: vi.fn(),
   };
 
+  const RedisMock = vi.fn(() => mockRedis);
+
   return {
-    default: vi.fn(() => mockRedis),
+    default: RedisMock,
+    Redis: RedisMock,
   };
 });
 

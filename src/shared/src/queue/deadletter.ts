@@ -1,6 +1,6 @@
-import { Queue, Job } from 'bullmq';
+import { Job } from 'bullmq';
 import { QueueFactory } from './factory.js';
-import { JobType, JobTypes, JobResult } from './types.js';
+import { JobType, JobTypes } from './types.js';
 import { Logger } from '../utils/index.js';
 
 /**

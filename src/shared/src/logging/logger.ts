@@ -1,5 +1,5 @@
-import pino from 'pino';
-import { LogConfig, LogConfigSchema, LogLevel, LogContext, StructuredLogData } from './types.js';
+import { pino } from 'pino';
+import { LogConfig, LogConfigSchema, LogLevel, LogContext } from './types.js';
 import { CorrelationManager } from './correlation.js';
 import { env } from '../config/environment.js';
 
@@ -14,7 +14,7 @@ export class StructuredLogger {
       level: env.LOG_LEVEL || 'info',
       format: env.LOG_FORMAT || (env.NODE_ENV === 'development' ? 'pretty' : 'json'),
       service: serviceName,
-      version: process.env.npm_package_version || '1.0.0',
+      version: process.env['npm_package_version'] || '1.0.0',
       environment: env.NODE_ENV,
       ...config,
     });
@@ -32,7 +32,7 @@ export class StructuredLogger {
         service: this.config.service,
         version: this.config.version,
         environment: this.config.environment,
-        hostname: process.env.HOSTNAME || require('os').hostname(),
+        hostname: process.env['HOSTNAME'] || require('os').hostname(),
         pid: process.pid,
       },
 

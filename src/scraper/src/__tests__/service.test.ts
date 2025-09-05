@@ -10,18 +10,33 @@ vi.mock('@review-scraper/shared', async () => {
     createQueueConnection: vi.fn(),
     createQueueFactory: vi.fn(),
     createDatabasePool: vi.fn(),
+    getQueueConnection: vi.fn(),
+    getDatabasePool: vi.fn(),
+    DatabasePool: {
+      getInstance: vi.fn(),
+    },
     QueueMonitor: vi.fn(),
     Logger: vi.fn(() => ({
       info: vi.fn(),
       warn: vi.fn(),
       error: vi.fn(),
+      debug: vi.fn(),
     })),
   };
 });
 
-vi.mock('../worker.js', () => ({
+vi.mock('./worker.js', () => ({
   ScraperWorker: vi.fn(() => ({
     processScrapingJob: vi.fn(),
+  })),
+}));
+
+vi.mock('./queue-worker.js', () => ({
+  BullMQScraperWorker: vi.fn(() => ({
+    processScrapingJob: vi.fn(),
+    getStatus: vi.fn().mockResolvedValue({ isRunning: true, running: true }),
+    healthCheck: vi.fn().mockResolvedValue({ status: 'healthy' }),
+    shutdown: vi.fn().mockResolvedValue(undefined),
   })),
 }));
 
@@ -32,22 +47,26 @@ describe('ScraperService', () => {
   let mockDbPool: any;
   let mockMonitor: any;
   let mockWorker: any;
+  let shared: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
     // Import and setup mocks
-    const shared = await import('@review-scraper/shared');
-    const { ScraperWorker } = await import('../worker.js');
+    shared = await import('@review-scraper/shared');
+    const { BullMQScraperWorker } = await import('./queue-worker.js');
 
     mockConnection = {
       connect: vi.fn(),
       close: vi.fn(),
       getStats: vi.fn().mockResolvedValue({ connected: true, host: 'localhost' }),
+      health: vi.fn().mockResolvedValue({ status: 'healthy' }),
+      connectionConfig: {
+        connection: { host: 'localhost', port: 6379 }
+      }
     };
 
     mockFactory = {
-      createWorker: vi.fn(),
       addJob: vi.fn(),
       getQueueStats: vi.fn(),
       pauseQueue: vi.fn(),
@@ -67,17 +86,19 @@ describe('ScraperService', () => {
 
     mockWorker = {
       processScrapingJob: vi.fn(),
+      getStatus: vi.fn().mockResolvedValue({ isRunning: true, running: true }),
+      healthCheck: vi.fn().mockResolvedValue({ status: 'healthy' }),
+      shutdown: vi.fn().mockResolvedValue(undefined),
     };
 
     (shared.createQueueConnection as any).mockReturnValue(mockConnection);
     (shared.createQueueFactory as any).mockReturnValue(mockFactory);
     (shared.createDatabasePool as any).mockReturnValue(mockDbPool);
+    (shared.getQueueConnection as any).mockReturnValue(mockConnection);
+    (shared.getDatabasePool as any).mockReturnValue(mockDbPool);
+    (shared.DatabasePool.getInstance as any).mockResolvedValue(mockDbPool);
     (shared.QueueMonitor as any).mockReturnValue(mockMonitor);
-    (ScraperWorker as any).mockReturnValue(mockWorker);
-    (ScraperWorker as any).getWorkerConfig = vi.fn().mockReturnValue({
-      concurrency: 1,
-      limiter: { max: 10, duration: 60000 },
-    });
+    (BullMQScraperWorker as any).mockReturnValue(mockWorker);
 
     service = new ScraperService();
   });
@@ -88,34 +109,24 @@ describe('ScraperService', () => {
 
   describe('initialize', () => {
     it('should initialize all components successfully', async () => {
-      mockDbPool.initialize.mockResolvedValue(undefined);
       mockConnection.connect.mockResolvedValue(undefined);
-      mockFactory.createWorker.mockResolvedValue({ id: 'worker1' });
 
       await service.initialize();
 
-      expect(mockDbPool.initialize).toHaveBeenCalledOnce();
+      expect(shared.DatabasePool.getInstance).toHaveBeenCalledOnce();
       expect(mockConnection.connect).toHaveBeenCalledOnce();
-      expect(mockFactory.createWorker).toHaveBeenCalledWith(
-        JobTypes.SCRAPE_REVIEWS,
-        expect.any(Function),
-        expect.objectContaining({
-          concurrency: 1,
-          limiter: { max: 10, duration: 60000 },
-        })
-      );
       expect(service.running).toBe(true);
     });
 
     it('should handle initialization errors', async () => {
-      mockDbPool.initialize.mockRejectedValue(new Error('Database connection failed'));
+      (shared.DatabasePool.getInstance as any).mockRejectedValue(new Error('Database connection failed'));
 
       await expect(service.initialize()).rejects.toThrow('Database connection failed');
       expect(service.running).toBe(false);
     });
 
     it('should handle queue connection errors', async () => {
-      mockDbPool.initialize.mockResolvedValue(undefined);
+      (shared.DatabasePool.getInstance as any).mockResolvedValue(mockDbPool);
       mockConnection.connect.mockRejectedValue(new Error('Redis connection failed'));
 
       await expect(service.initialize()).rejects.toThrow('Redis connection failed');
@@ -272,7 +283,7 @@ describe('ScraperService', () => {
 
       expect(status.status).toBe('healthy');
       expect(status.service).toBe('scraper');
-      expect(status.worker.running).toBe(true);
+      expect(status.worker.isRunning).toBe(true);
       expect(status.connections).toBeDefined();
     });
 
@@ -420,9 +431,7 @@ describe('ScraperService', () => {
 
   // Helper function to initialize service with mocked dependencies
   async function initializeService() {
-    mockDbPool.initialize.mockResolvedValue(undefined);
     mockConnection.connect.mockResolvedValue(undefined);
-    mockFactory.createWorker.mockResolvedValue({ id: 'worker1' });
     await service.initialize();
   }
 });

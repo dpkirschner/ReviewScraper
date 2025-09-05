@@ -111,6 +111,7 @@ logs/
 # Data files (scraping outputs)
 data/raw/*.csv
 data/processed/
+data/sample/
 
 # OS
 .DS_Store

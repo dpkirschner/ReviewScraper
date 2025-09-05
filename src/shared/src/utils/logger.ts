@@ -7,7 +7,7 @@ import { StructuredLogger, createLogger } from '../logging/logger.js';
 export class Logger {
   private structuredLogger: StructuredLogger;
 
-  constructor(private context: string = 'App') {
+  constructor(context: string = 'App') {
     this.structuredLogger = createLogger(context);
   }
 

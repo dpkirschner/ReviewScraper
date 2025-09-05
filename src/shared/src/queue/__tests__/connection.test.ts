@@ -16,8 +16,11 @@ vi.mock('ioredis', () => {
     disconnect: vi.fn(),
   };
 
+  const RedisMock = vi.fn(() => mockRedis);
+
   return {
-    default: vi.fn(() => mockRedis),
+    default: RedisMock,
+    Redis: RedisMock,
   };
 });
 
@@ -202,7 +205,7 @@ describe('QueueConnection', () => {
     it('should handle Redis connection errors gracefully', async () => {
       // Mock Redis constructor to throw
       const IORedis = await import('ioredis');
-      const mockConstructor = vi.mocked(IORedis.default);
+      const mockConstructor = vi.mocked(IORedis.Redis);
       mockConstructor.mockImplementationOnce(() => {
         throw new Error('Connection failed');
       });

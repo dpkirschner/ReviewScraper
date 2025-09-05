@@ -11,6 +11,8 @@ export interface CorrelationContext {
   parentId?: string;
   startTime: number;
   metadata?: Record<string, any>;
+  operation?: string;
+  component?: string;
 }
 
 // AsyncLocalStorage for correlation context
@@ -41,12 +43,12 @@ export class CorrelationManager {
     const existing = correlationStorage.getStore();
     const newContext: CorrelationContext = {
       correlationId: context.correlationId || existing?.correlationId || randomUUID(),
-      requestId: context.requestId || existing?.requestId,
-      userId: context.userId || existing?.userId,
-      sessionId: context.sessionId || existing?.sessionId,
-      traceId: context.traceId || existing?.traceId,
-      spanId: context.spanId || existing?.spanId,
-      parentId: context.parentId || existing?.correlationId,
+      requestId: context.requestId || existing?.requestId || undefined,
+      userId: context.userId || existing?.userId || undefined,
+      sessionId: context.sessionId || existing?.sessionId || undefined,
+      traceId: context.traceId || existing?.traceId || undefined,
+      spanId: context.spanId || existing?.spanId || undefined,
+      parentId: context.parentId || existing?.correlationId || undefined,
       startTime: context.startTime || existing?.startTime || Date.now(),
       metadata: { ...existing?.metadata, ...context.metadata },
     };
@@ -84,12 +86,12 @@ export class CorrelationManager {
     
     return {
       correlationId: randomUUID(),
-      requestId: parent?.requestId,
-      userId: parent?.userId,
-      sessionId: parent?.sessionId,
+      requestId: parent?.requestId || undefined,
+      userId: parent?.userId || undefined,
+      sessionId: parent?.sessionId || undefined,
       traceId: parent?.traceId || randomUUID(),
       spanId: randomUUID(),
-      parentId: parent?.correlationId,
+      parentId: parent?.correlationId || undefined,
       startTime: Date.now(),
       metadata: { ...parent?.metadata, ...additionalContext?.metadata },
       ...additionalContext,

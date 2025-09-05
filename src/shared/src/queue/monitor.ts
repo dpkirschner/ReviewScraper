@@ -248,10 +248,10 @@ export class QueueMonitor {
         id: job.id?.toString() || '',
         data: job.data,
         progress: job.progress || 0,
-        createdAt: job.timestamp ? new Date(job.timestamp).toISOString() : undefined,
-        processedOn: job.processedOn ? new Date(job.processedOn).toISOString() : undefined,
-        finishedOn: job.finishedOn ? new Date(job.finishedOn).toISOString() : undefined,
-        failedReason: job.failedReason,
+        ...(job.timestamp && { createdAt: new Date(job.timestamp).toISOString() }),
+        ...(job.processedOn && { processedOn: new Date(job.processedOn).toISOString() }),
+        ...(job.finishedOn && { finishedOn: new Date(job.finishedOn).toISOString() }),
+        ...(job.failedReason && { failedReason: job.failedReason }),
       }));
 
     // Get DLQ information

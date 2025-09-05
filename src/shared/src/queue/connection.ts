@@ -1,4 +1,4 @@
-import IORedis from 'ioredis';
+import { Redis as IORedis } from 'ioredis';
 import type { Redis } from 'ioredis';
 import { Logger } from '../utils/index.js';
 import { QueueConfig, QueueConfigSchema } from './types.js';

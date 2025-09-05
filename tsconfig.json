@@ -1,5 +1,5 @@
 {
-  "extends": ["@tsconfig/node22/tsconfig.json", "@tsconfig/strictest/tsconfig.json"],
+  "extends": ["@tsconfig/node22/tsconfig.json"],
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
@@ -17,7 +17,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo"
   },

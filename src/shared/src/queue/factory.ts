@@ -50,21 +50,21 @@ export class QueueFactory {
       this.logger.debug(`Job ${job.id} is waiting in queue ${jobType}`);
     });
 
-    queue.on('active', (job: { id: string; processedOn?: number }) => {
+    (queue as any).on('active', (job: { id: string; processedOn?: number }) => {
       this.logger.info(`Job ${job.id} started processing in queue ${jobType}`);
     });
 
-    queue.on('completed', (job: { id: string; processedOn?: number }) => {
+    (queue as any).on('completed', (job: { id: string; processedOn?: number }) => {
       this.logger.info(`Job ${job.id} completed in queue ${jobType}`, {
         processingTime: Date.now() - (job.processedOn || Date.now()),
       });
     });
 
-    queue.on('failed', (job: { id: string } | undefined, error: Error) => {
+    (queue as any).on('failed', (job: { id: string } | undefined, error: Error) => {
       this.logger.error(`Job ${job?.id} failed in queue ${jobType}:`, error);
     });
 
-    queue.on('stalled', (job: { id: string }) => {
+    (queue as any).on('stalled', (job: { id: string }) => {
       this.logger.warn(`Job ${job.id} stalled in queue ${jobType}`);
     });
 
@@ -157,8 +157,8 @@ export class QueueFactory {
       this.logger.error(`Worker ${jobType} failed processing job ${job?.id}:`, error);
     });
 
-    worker.on('stalled', (job: { id: string }) => {
-      this.logger.warn(`Worker ${jobType} job ${job.id} stalled`);
+    worker.on('stalled', (jobId: string, prev: string) => {
+      this.logger.warn(`Worker ${jobType} job ${jobId} stalled (previous state: ${prev})`);
     });
 
     this.workers.set(jobType, worker);

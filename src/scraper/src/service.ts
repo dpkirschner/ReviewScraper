@@ -2,6 +2,7 @@ import {
   createQueueConnection, 
   createQueueFactory, 
   createDatabasePool,
+  DatabasePool,
   QueueConnection,
   QueueFactory,
   QueueMonitor,
@@ -36,8 +37,7 @@ export class ScraperService {
       this.logger.info('Initializing scraper service...');
 
       // Initialize database connection
-      const dbPool = createDatabasePool();
-      await dbPool.initialize();
+      const dbPool = await DatabasePool.getInstance();
 
       // Initialize queue connection
       this.connection = createQueueConnection();

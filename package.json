@@ -8,8 +8,7 @@
   "workspaces": [
     "src/scraper",
     "src/labeler",
-    "src/shared",
-    "src/api"
+    "src/shared"
   ],
   "scripts": {
     "build": "pnpm -r build",

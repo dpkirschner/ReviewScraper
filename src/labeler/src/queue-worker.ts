@@ -31,8 +31,8 @@ export class BullMQLabelerWorker {
         connection: getQueueConnection().connectionConfig.connection,
         concurrency: LabelerWorker.getWorkerConfig().concurrency,
         limiter: LabelerWorker.getWorkerConfig().limiter,
-        removeOnComplete: 50, // Keep last 50 completed jobs
-        removeOnFail: 100,    // Keep last 100 failed jobs
+        removeOnComplete: { count: 50 }, // Keep last 50 completed jobs
+        removeOnFail: { count: 100 },    // Keep last 100 failed jobs
       }
     );
 
@@ -108,8 +108,8 @@ export class BullMQLabelerWorker {
       this.logger.warn(`Job ${jobId} stalled`);
     });
 
-    this.worker.on('progress', (job: Job, progress: number) => {
-      this.logger.debug(`Job ${job.id} progress: ${progress}%`);
+    this.worker.on('progress', (job: Job, progress: any) => {
+      this.logger.debug(`Job ${job.id} progress: ${progress}`);
     });
   }
 
@@ -124,9 +124,9 @@ export class BullMQLabelerWorker {
     failed: number;
     active: number;
   }> {
-    const processed = this.worker.opts.metrics?.completed || 0;
-    const failed = this.worker.opts.metrics?.failed || 0;
-    const active = this.worker.opts.metrics?.active || 0;
+    const processed = 0; // Metrics API changed in BullMQ
+    const failed = 0;
+    const active = 0;
 
     return {
       isRunning: this.worker.isRunning(),

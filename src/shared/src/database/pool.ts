@@ -1,6 +1,6 @@
 import { Pool, PoolClient, PoolConfig } from 'pg';
 import { DatabaseConfig, DatabaseConfigSchema, DatabaseHealth } from './types.js';
-import { Logger } from '../utils/logger.js';
+import { StructuredLogger as Logger } from '../logging/logger.js';
 
 export class DatabasePool {
   private static instance: DatabasePool | null = null;
@@ -41,6 +41,22 @@ export class DatabasePool {
       await DatabasePool.instance.close();
       DatabasePool.instance = null;
     }
+  }
+
+  public static hasInstance(): boolean {
+    return DatabasePool.instance !== null;
+  }
+
+  public static getCurrentInstance(): DatabasePool | null {
+    return DatabasePool.instance;
+  }
+
+  public static createInstance(config?: Partial<DatabaseConfig>): DatabasePool {
+    if (DatabasePool.instance) {
+      throw new Error('Database pool already exists. Use getDatabasePool() to get the existing instance.');
+    }
+    DatabasePool.instance = new DatabasePool(config);
+    return DatabasePool.instance;
   }
 
   private parseDatabaseUrl(url: string, overrides: Partial<DatabaseConfig>): DatabaseConfig {
@@ -244,24 +260,15 @@ export class DatabasePool {
 
 // Convenience functions for easier migration
 export function createDatabasePool(config?: Partial<DatabaseConfig>): DatabasePool {
-  // In singleton pattern, we can't directly return a new instance
-  // Instead, we set the instance if it doesn't exist yet
-  if (DatabasePool.instance) {
-    throw new Error('Database pool already exists. Use getDatabasePool() to get the existing instance.');
-  }
-  
-  // Return a promise-like object that the caller can await if needed
-  const instance = new DatabasePool(config);
-  DatabasePool.instance = instance;
-  return instance;
+  return DatabasePool.createInstance(config);
 }
 
 export function getDatabasePool(): DatabasePool {
-  if (!DatabasePool.instance) {
+  const instance = DatabasePool.getCurrentInstance();
+  if (!instance) {
     throw new Error('Database pool not initialized. Call createDatabasePool() first.');
   }
-  
-  return DatabasePool.instance;
+  return instance;
 }
 
 export const closeDatabasePool = DatabasePool.closeInstance;

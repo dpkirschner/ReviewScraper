@@ -162,10 +162,10 @@ export class ScraperWorker {
       return {
         id: appId,
         title: 'Unknown App',
-        description: null,
-        version: null,
-        developer: null,
-        category: null,
+        description: undefined,
+        version: undefined,
+        developer: undefined,
+        category: undefined,
       };
     }
   }
@@ -246,7 +246,7 @@ export class ScraperWorker {
           text: review.text || '',
           url: review.url || null,
           date: new Date(review.date),
-          replyDate: review.replyDate ? new Date(review.replyDate) : null,
+          replyDate: review.replyDate ? new Date(review.replyDate) : undefined,
           replyText: review.replyText || null,
           helpfulVotes: review.helpfulVotes || 0,
           country: countryCode.toUpperCase(),

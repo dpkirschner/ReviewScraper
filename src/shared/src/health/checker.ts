@@ -2,8 +2,7 @@ import {
   HealthChecker, 
   DependencyHealth, 
   ServiceHealth, 
-  HealthStatus, 
-  HealthCheckOptions,
+  HealthStatus,
   ReadinessCheck,
   LivenessCheck
 } from './types.js';
@@ -19,7 +18,7 @@ export class HealthMonitor {
   private version: string;
   private startTime: Date;
   private lastHealthCheck: ServiceHealth | null = null;
-  private checkInterval?: NodeJS.Timeout;
+  private checkInterval?: NodeJS.Timeout | undefined;
 
   constructor(serviceName: string, version: string = '1.0.0') {
     this.serviceName = serviceName;
@@ -73,7 +72,7 @@ export class HealthMonitor {
       async check(): Promise<DependencyHealth> {
         const startTime = Date.now();
         const memUsage = process.memoryUsage();
-        const memLimit = parseInt(process.env.MEMORY_LIMIT || '0') || 1024 * 1024 * 1024; // 1GB default
+        const memLimit = parseInt(process.env['MEMORY_LIMIT'] || '0') || 1024 * 1024 * 1024; // 1GB default
         
         const heapUsedPercent = (memUsage.heapUsed / memLimit) * 100;
         const status: HealthStatus = heapUsedPercent > 90 ? 'unhealthy' :
@@ -360,7 +359,7 @@ export class HealthMonitor {
       version: this.version,
       startTime: this.startTime,
       uptime: Date.now() - this.startTime.getTime(),
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env['NODE_ENV'] || 'development',
       nodeVersion: process.version,
       platform: process.platform,
       pid: process.pid,
